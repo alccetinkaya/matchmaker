@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "outDir": "build",
+        "strict": true,
+        "esModuleInterop": true,
+        "lib": ["esnext"]
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
