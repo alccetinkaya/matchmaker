@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model game_info {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique(map: "game_info_name_unq") @db.VarChar(255)
+  league    league[]
+  user_info user_info[]
+}
+
+model user_info {
+  id         Int       @id @default(autoincrement())
+  first_name String    @db.VarChar
+  last_name  String    @db.VarChar
+  email      String    @unique(map: "user_info_unq") @db.VarChar
+  password   String    @db.VarChar
+  role       Int       @db.SmallInt
+  game_info  game_info @relation(fields: [role], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_info_col_role")
+}
+
+model user_role {
+  id   Int    @id @default(autoincrement()) @db.SmallInt
+  name String @unique(map: "user_role_name_unq") @db.VarChar(255)
+}
+
+model fixture {
+  id          Int     @id @default(autoincrement())
+  team_list   Json    @db.Json
+  winner_team String? @db.VarChar
+  game_id     Int     @db.SmallInt
+  is_active   Boolean @default(true)
+}
+
+model league {
+  id          Int         @default(autoincrement()) @db.SmallInt
+  player_name String      @db.VarChar
+  point       Int
+  match_count Int
+  league_id   Int         @db.SmallInt
+  game_id     Int         @db.SmallInt
+  game_info   game_info   @relation(fields: [game_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "league_game_id_fk")
+  league_info league_info @relation(fields: [league_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "league_id_fk")
+  player_list player_list @relation(fields: [player_name], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "league_player_name_fk")
+
+  @@id([player_name, game_id])
+}
+
+model league_info {
+  id     Int      @id @db.SmallInt
+  name   String   @unique(map: "league_info_id_name_unq") @db.VarChar
+  point  Int      @db.SmallInt
+  league league[]
+}
+
+model player_list {
+  id     Int      @id @default(autoincrement())
+  name   String   @unique(map: "player_list_name_unq") @db.VarChar
+  league league[]
+}
