@@ -12,6 +12,21 @@
         "preLaunchTask": "tsc: build - tsconfig.json",
         "outFiles": ["${workspaceFolder}/build/**/*.js"],
         "args": []
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Debug AVA test file",
+        "program": "${workspaceFolder}/node_modules/ava/entrypoints/cli.mjs",
+        "preLaunchTask": "tsc: build - tsconfig.json",
+        "outFiles": ["${workspaceFolder}/build/**/*.js"],
+        "args": [
+          "build/**/${fileBasenameNoExtension}.*"
+        ],
+        "outputCapture": "std",
+        "skipFiles": [
+          "<node_internals>/**/*.js"
+        ]
       }
     ]
   }
