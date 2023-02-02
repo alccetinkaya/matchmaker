@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
-        "sourceMap": true,
+        "target": "ESNext",
+        "module": "commonjs",
         "outDir": "build",
-        "strict": true,
+        "sourceMap": true,
         "esModuleInterop": true,
-        "lib": ["esnext"]
     },
     "exclude": [
         "node_modules"
