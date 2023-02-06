@@ -9,6 +9,11 @@ import { LeagueData, LeagueInfoData } from "../models/league.model";
 const prisma = new PrismaClient()
 
 export class PrismaDatabaseService implements IDatabase {
+    getErrorMessage(error: any): string {
+        let data = error.message.split("\n");
+        return data[data.length - 1];
+    }
+
     async createGame(game: GameData): Promise<boolean> {
         try {
             let rval = await prisma.game_info.create({
@@ -18,8 +23,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval ? true : false;
         } catch (error) {
-            console.log(`Database service create game failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -30,7 +34,6 @@ export class PrismaDatabaseService implements IDatabase {
                     name: name
                 }
             });
-
             if (rval.length == 0) return null;
             if (rval.length > 1) throw new Error(`Select game returned more than one! Name: ${name}`);
 
@@ -39,8 +42,7 @@ export class PrismaDatabaseService implements IDatabase {
                 name: result.name
             }
         } catch (error) {
-            console.log(`Database service select game failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -53,8 +55,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval.count ? true : false;
         } catch (error) {
-            console.log(`Database service delete game failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -71,8 +72,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval ? true : false;
         } catch (error) {
-            console.log(`Database service create user failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -96,8 +96,7 @@ export class PrismaDatabaseService implements IDatabase {
                 role: result.role
             }
         } catch (error) {
-            console.log(`Database service select user failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -110,8 +109,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval.count ? true : false;
         } catch (error) {
-            console.log(`Database service delete user failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -126,8 +124,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval ? rval.id : 0;
         } catch (error) {
-            console.log(`Database service create fixture failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -150,8 +147,7 @@ export class PrismaDatabaseService implements IDatabase {
                 isActive: fixture.is_active
             }
         } catch (error) {
-            console.log(`Database service select fixture failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -187,8 +183,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval.count ? true : false;
         } catch (error) {
-            console.log(`Database service delete fixture failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -201,8 +196,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval ? true : false;
         } catch (error) {
-            console.log(`Database service create player failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -222,8 +216,7 @@ export class PrismaDatabaseService implements IDatabase {
                 name: result.name
             }
         } catch (error) {
-            console.log(`Database service select player failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -236,8 +229,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval.count ? true : false;
         } catch (error) {
-            console.log(`Database service delete player failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -252,8 +244,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval ? true : false;
         } catch (error) {
-            console.log(`Database service create league failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -275,8 +266,7 @@ export class PrismaDatabaseService implements IDatabase {
                 point: result.point
             }
         } catch (error) {
-            console.log(`Database service select league failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -311,8 +301,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval.count ? true : false;
         } catch (error) {
-            console.log(`Database service delete league failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -329,8 +318,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval ? true : false;
         } catch (error) {
-            console.log(`Database service create player league failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -354,8 +342,7 @@ export class PrismaDatabaseService implements IDatabase {
                 gameId: result.game_id
             }
         } catch (error) {
-            console.log(`Database service select player league failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 
@@ -395,8 +382,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
             return rval.count ? true : false;
         } catch (error) {
-            console.log(`Database service delete player league failed: ${error.message}`);
-            throw error.message;
+            throw this.getErrorMessage(error);
         }
     }
 } 
