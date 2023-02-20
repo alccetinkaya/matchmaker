@@ -1,5 +1,3 @@
-import { GameID } from "./game.model";
-
 export enum LeagueID {
     PREMIER = 1,
     BAL,
@@ -13,9 +11,9 @@ export interface LeagueInfoData {
 }
 
 export interface LeagueData {
-    playerName: string,
-    point: number,
-    matchCount: number,
-    leagueId: LeagueID,
-    gameId: GameID
+    playerName: string;
+    point: number;
+    matchCount: number;
+    leagueId: LeagueID;
+    gameName: string;
 }

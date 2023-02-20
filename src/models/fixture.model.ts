@@ -1,8 +1,10 @@
-import { GameID } from "./game.model";
+export interface FixtureMatchInfo {
+    teamList: object;
+    winner: string;
+    isActive: boolean;
+}
 
 export interface FixtureData {
-    teamList: any;
-    winnerTeam: string;
-    gameId: GameID;
-    isActive: boolean;
+    matchInfo: FixtureMatchInfo[];
+    gameName: string;
 }
