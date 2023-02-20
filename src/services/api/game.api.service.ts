@@ -90,17 +90,16 @@ export class GameApiService {
             if (!rval) {
                 return prepareFailureMsg({
                     failCode: FailCode.OPERATION_ERROR,
-                    failDescription: "Game couldn't be created in database",
+                    failDescription: `Game '${game.name}' couldn't be created`,
                     statusCode: 500
                 }, {
-                    detailCode: FailDetailCode.DATABASE_ERROR,
-                    detailDescription: "Database function return value is not 'true'"
+                    detailCode: FailDetailCode.DATABASE_ERROR
                 });
             }
         } catch (error) {
             return prepareFailureMsg({
                 failCode: FailCode.OPERATION_ERROR,
-                failDescription: "Game couldn't be created in database",
+                failDescription: `Game '${game.name}' couldn't be created`,
                 statusCode: 500
             }, {
                 detailCode: FailDetailCode.DATABASE_ERROR,
@@ -109,7 +108,7 @@ export class GameApiService {
         }
 
         return prepareSuccessMsg({
-            description: `Game ${game.name} has created`
+            description: `Game '${game.name}' has created`
         });
     }
 
@@ -127,14 +126,14 @@ export class GameApiService {
             if (!dbResp) {
                 return prepareFailureMsg({
                     failCode: FailCode.OPERATION_ERROR,
-                    failDescription: "Game couldn't found",
+                    failDescription: `Game '${game.name}' couldn't found`,
                 }, {
                 });
             }
         } catch (error) {
             return prepareFailureMsg({
                 failCode: FailCode.OPERATION_ERROR,
-                failDescription: "Game couldn't be selected from database",
+                failDescription: `Game '${game.name}' couldn't found`,
                 statusCode: 500
             }, {
                 detailCode: FailDetailCode.DATABASE_ERROR,
@@ -162,15 +161,15 @@ export class GameApiService {
             if (!rval) {
                 return prepareFailureMsg({
                     failCode: FailCode.OPERATION_ERROR,
-                    failDescription: "Game couldn't deleted",
+                    failDescription: `Game '${game.name}' couldn't be deleted`,
                 }, {
-                    detailDescription: `Game ${game.name} couldn't found`
+                    detailDescription: "Game couldn't found"
                 });
             }
         } catch (error) {
             return prepareFailureMsg({
                 failCode: FailCode.OPERATION_ERROR,
-                failDescription: "Game couldn't be deleted from database",
+                failDescription: `Game '${game.name}' couldn't be deleted`,
                 statusCode: 500
             }, {
                 detailCode: FailDetailCode.DATABASE_ERROR,
