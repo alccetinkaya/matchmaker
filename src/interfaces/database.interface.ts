@@ -18,13 +18,14 @@ export interface IDatabase {
     // fixture interface
     createFixture(fixture: FixtureData): Promise<number>;
     selectFixture(id: number): Promise<FixtureData>;
-    updateFixture(id: number, fixture: FixtureData): Promise<FixtureData>;
+    updateFixture(id: number, matchInd: number, winner: string): Promise<FixtureData>;
     deleteFixture(id: number): Promise<boolean>;
 
     // player interface
     createPlayer(player: PlayerData): Promise<boolean>;
     selectPlayer(name: string): Promise<PlayerData>;
-    deletePlayer(player: PlayerData): Promise<boolean>;
+    selectAllPlayer(): Promise<PlayerData[]>;
+    deletePlayer(name: string): Promise<boolean>;
 
     // league interface
     createLeague(data: LeagueInfoData): Promise<boolean>;

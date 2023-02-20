@@ -2,7 +2,7 @@ import { IDatabase } from "../interfaces/database.interface";
 import { UserData } from "../models/user.model";
 import { PrismaClient, Prisma } from '@prisma/client'
 import { GameData } from "../models/game.model";
-import { FixtureData } from "../models/fixture.model";
+import { FixtureData, FixtureMatchInfo } from "../models/fixture.model";
 import { PlayerData } from "../models/player.model";
 import { LeagueData, LeagueInfoData } from "../models/league.model";
 
@@ -35,7 +35,7 @@ export class PrismaDatabaseService implements IDatabase {
                 }
             });
             if (rval.length == 0) return null;
-            if (rval.length > 1) throw new Error(`Select game returned more than one! Name: ${name}`);
+            if (rval.length > 1) throw `Select game returned more than one! Name: ${name}`;
 
             let result = rval.at(0);
             return {
@@ -85,7 +85,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
 
             if (rval.length == 0) return null;
-            if (rval.length > 1) throw new Error(`Select user returned more than one! Email: ${email}`);
+            if (rval.length > 1) throw `Select user returned more than one! Email: ${email}`;
 
             let result = rval.at(0);
             return {
@@ -117,9 +117,8 @@ export class PrismaDatabaseService implements IDatabase {
         try {
             let rval = await prisma.fixture.create({
                 data: {
-                    team_list: fixture.teamList,
-                    game_id: fixture.gameId,
-                    is_active: fixture.isActive
+                    match_info: (fixture.matchInfo as unknown) as Prisma.JsonArray,
+                    game_name: fixture.gameName,
                 }
             });
             return rval ? rval.id : 0;
@@ -137,37 +136,35 @@ export class PrismaDatabaseService implements IDatabase {
             });
 
             if (rval.length == 0) return null;
-            if (rval.length > 1) throw new Error(`Select fixture returned more than one! ID: ${id}`);
+            if (rval.length > 1) throw `Select fixture returned more than one! ID: ${id}`;
 
             let fixture = rval.at(0);
             return {
-                teamList: fixture.team_list,
-                winnerTeam: fixture.winner_team,
-                gameId: fixture.game_id,
-                isActive: fixture.is_active
+                matchInfo: (fixture.match_info as unknown) as FixtureMatchInfo[],
+                gameName: fixture.game_name,
             }
         } catch (error) {
             throw this.getErrorMessage(error);
         }
     }
 
-    async updateFixture(id: number, fixture: FixtureData): Promise<FixtureData> {
+    async updateFixture(id: number, matchInd: number, winner: string): Promise<FixtureData> {
         try {
+            let fixture = await this.selectFixture(id);
+            fixture.matchInfo[matchInd].winner = winner;
+
             let rval = await prisma.fixture.update({
                 where: {
                     id: id
                 },
                 data: {
-                    winner_team: fixture.winnerTeam,
-                    is_active: fixture.isActive
+                    match_info: (fixture.matchInfo as unknown) as Prisma.JsonArray
                 }
             });
 
             return {
-                teamList: rval.team_list,
-                winnerTeam: rval.winner_team,
-                gameId: rval.game_id,
-                isActive: rval.is_active
+                matchInfo: (rval.match_info as unknown) as FixtureMatchInfo[],
+                gameName: rval.game_name,
             }
         } catch (error) {
             return null;
@@ -209,7 +206,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
 
             if (rval.length == 0) return null;
-            if (rval.length > 1) throw new Error(`Select player returned more than one! Name: ${name}`);
+            if (rval.length > 1) throw `Select player returned more than one! Name: ${name}`;
 
             let result = rval.at(0);
             return {
@@ -220,11 +217,19 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async deletePlayer(player: PlayerData): Promise<boolean> {
+    async selectAllPlayer(): Promise<PlayerData[]> {
+        try {
+            return await prisma.player_list.findMany();
+        } catch (error) {
+            throw this.getErrorMessage(error);
+        }
+    }
+
+    async deletePlayer(name: string): Promise<boolean> {
         try {
             const rval = await prisma.player_list.deleteMany({
                 where: {
-                    name: player.name
+                    name: name
                 }
             });
             return rval.count ? true : false;
@@ -257,7 +262,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
 
             if (rval.length == 0) return null;
-            if (rval.length > 1) throw new Error(`Select league returned more than one! Name: ${name}`);
+            if (rval.length > 1) throw `Select league returned more than one! Name: ${name}`;
 
             let result = rval.at(0);
             return {
@@ -312,7 +317,7 @@ export class PrismaDatabaseService implements IDatabase {
                     player_name: data.playerName,
                     point: data.point,
                     match_count: data.matchCount,
-                    game_id: data.gameId,
+                    game_name: data.gameName,
                     league_id: data.leagueId
                 }
             });
@@ -331,7 +336,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
 
             if (rval.length == 0) return null;
-            if (rval.length > 1) throw new Error(`Select player league returned more than one! Name: ${name}`);
+            if (rval.length > 1) throw `Select player league returned more than one! Name: ${name}`;
 
             let result = rval.at(0);
             return {
@@ -339,7 +344,7 @@ export class PrismaDatabaseService implements IDatabase {
                 point: result.point,
                 matchCount: result.match_count,
                 leagueId: result.league_id,
-                gameId: result.game_id
+                gameName: result.game_name
             }
         } catch (error) {
             throw this.getErrorMessage(error);
@@ -350,9 +355,9 @@ export class PrismaDatabaseService implements IDatabase {
         try {
             let rval = await prisma.league.update({
                 where: {
-                    player_name_game_id: {
+                    player_name_game_name: {
                         player_name: data.playerName,
-                        game_id: data.gameId
+                        game_name: data.gameName
                     }
                 },
                 data: {
@@ -366,7 +371,7 @@ export class PrismaDatabaseService implements IDatabase {
                 point: rval.point,
                 matchCount: rval.match_count,
                 leagueId: rval.league_id,
-                gameId: rval.game_id
+                gameName: rval.game_name
             }
         } catch (error) {
             return null;
