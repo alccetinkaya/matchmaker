@@ -13,3 +13,23 @@ export async function removeEmptyKeys(obj: object): Promise<object> {
     }
     return obj;
 }
+
+export function getRandomInt(max: number): number {
+    return Math.floor(Math.random() * max);
+}
+
+export function generateUniqueRandomInt (max: number, generatedNumbers: number[]): number {
+    while (generatedNumbers.length < max) {
+        let r = getRandomInt(max);
+        if (generatedNumbers.indexOf(r) === -1) {
+            generatedNumbers.push(r);
+            return r;
+        }
+    }
+
+    return -1;
+}
+
+export function findDuplicates (arr: any[]) {
+    return arr.filter((value, index) => arr.indexOf(value) !== index);
+}
