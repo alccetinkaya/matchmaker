@@ -1,6 +1,6 @@
 import test from 'ava';
 import { FixtureData } from '../src/models/fixture.model';
-import { GameData, GameID } from '../src/models/game.model';
+import { GameData } from '../src/models/game.model';
 import { LeagueData, LeagueID, LeagueInfoData } from '../src/models/league.model';
 import { PlayerData } from '../src/models/player.model';
 import { UserData, UserRoleID } from '../src/models/user.model';
@@ -10,7 +10,7 @@ const dbSvc = new PrismaDatabaseService();
 
 // ############ game interface test ############
 const validGame: GameData = {
-    name: "test"
+    name: "unit_test"
 }
 const invalidGame: GameData = {
     name: "invalid"
@@ -78,11 +78,16 @@ test.serial('deleteUser', async t => {
 // ############ fixture interface test ############
 let fixtureId: number = null;
 const fixture: FixtureData = {
-    teamList: { teamA: ["test1", "test2"], teamB: ["test3", "test4"] },
-    gameId: GameID.FOOSBALL,
-    winnerTeam: null,
-    isActive: true
+    matchInfo: [{teamList: {teamA: ["test1", "test2"], teamB: ["test3", "test4"]}, isActive: true, winner: ""}],
+    gameName: validGame.name
 }
+
+///////////// create fixture test data /////////////
+test.serial('createForFixtureTestData', async t => {
+    let rval = await dbSvc.createGame(validGame);
+    t.deepEqual(rval, true);
+});
+////////////////////////////////////////////////////
 
 test.serial('createFixture', async t => {
     fixtureId = await dbSvc.createFixture(fixture);
@@ -91,24 +96,17 @@ test.serial('createFixture', async t => {
 
 test.serial('selectFixture', async t => {
     let rval = await dbSvc.selectFixture(fixtureId);
-    t.deepEqual(rval.teamList, fixture.teamList);
+    t.deepEqual(rval.matchInfo[0], fixture.matchInfo[0]);
 
     rval = await dbSvc.selectFixture(-1);
     t.deepEqual(rval, null);
 });
 
 test.serial('updateFixture', async t => {
-    let data: FixtureData = {
-        teamList: { team: "testTeam" },
-        winnerTeam: "test",
-        gameId: GameID.FOOSBALL,
-        isActive: false
-    };
-    let rval = await dbSvc.updateFixture(fixtureId, data);
-    t.deepEqual(rval.isActive, data.isActive);
-    t.deepEqual(rval.winnerTeam, data.winnerTeam);
+    let rval = await dbSvc.updateFixture(fixtureId, 0, "teamA");
+    t.deepEqual(rval.matchInfo[0].winner, "teamA");
 
-    rval = await dbSvc.updateFixture(-1, data);
+    rval = await dbSvc.updateFixture(-1, 0, "");
     t.deepEqual(rval, null);
 });
 
@@ -119,6 +117,13 @@ test.serial('deleteFixture', async t => {
     rval = await dbSvc.deleteFixture(-1);
     t.deepEqual(rval, false);
 });
+
+///////////// delete fixture test data /////////////
+test.serial('deleteForFixtureTestData', async t => {
+    let rval = await dbSvc.deleteGame(validGame.name);
+    t.deepEqual(rval, true);
+});
+////////////////////////////////////////////////////
 
 // ############ player interface test ############
 const validPlayer: PlayerData = {
@@ -142,10 +147,10 @@ test.serial('selectPlayer', async t => {
 });
 
 test.serial('deletePlayer', async t => {
-    let rval = await dbSvc.deletePlayer(validPlayer);
+    let rval = await dbSvc.deletePlayer(validPlayer.name);
     t.deepEqual(rval, true);
 
-    rval = await dbSvc.deletePlayer(invalidPlayer);
+    rval = await dbSvc.deletePlayer(invalidPlayer.name);
     t.deepEqual(rval, false);
 });
 
@@ -201,24 +206,28 @@ const validPlayerLeague: LeagueData = {
     point: 1,
     matchCount: 1,
     leagueId: validLeagueInfo.id,
-    gameId: GameID.FOOSBALL
+    gameName: "test"
 }
 const invalidPlayerLeague: LeagueData = {
     playerName: "invalidplayer",
     point: 10,
     matchCount: 10,
     leagueId: LeagueID.ASKO_KUSKO,
-    gameId: GameID.FOOSBALL
+    gameName: "test"
 }
 
-// ############ create test data ############
+///////////// create player league test data /////////////
 test.serial('createForPlayerLeagueTestData', async t => {
     let player = await dbSvc.createPlayer(validPlayer);
     t.deepEqual(player, true);
 
     let league = await dbSvc.createLeague(validLeagueInfo);
     t.deepEqual(league, true);
+
+    let game = await dbSvc.createGame(validGame);
+    t.deepEqual(game, true);
 });
+//////////////////////////////////////////////////////////
 
 test.serial('createPlayerLeague', async t => {
     let rval = await dbSvc.createPlayerLeague(validPlayerLeague);
@@ -240,7 +249,7 @@ test.serial('updatePlayerLeague', async t => {
         point: 100,
         matchCount: 100,
         leagueId: validPlayerLeague.leagueId,
-        gameId: validPlayerLeague.gameId
+        gameName: validPlayerLeague.gameName
     };
     let rval = await dbSvc.updatePlayerLeague(data);
     t.deepEqual(rval.point, data.point);
@@ -258,12 +267,15 @@ test.serial('deletePlayerLeague', async t => {
     t.deepEqual(rval, false);
 });
 
-// ############ delete test data ############
+///////////// delete player league test data /////////////
 test.serial('deletePlayerLeagueTestData', async t => {
-    let player = await dbSvc.deletePlayer(validPlayer);
+    let player = await dbSvc.deletePlayer(validPlayer.name);
     t.deepEqual(player, true);
 
     let league = await dbSvc.deleteLeague(validLeagueInfo.name);
     t.deepEqual(league, true);
+
+    let game = await dbSvc.deleteGame(validGame.name);
+    t.deepEqual(game, true);
 });
-// #####################################
+//////////////////////////////////////////////////////////
