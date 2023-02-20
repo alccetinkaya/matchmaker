@@ -8,20 +8,19 @@ datasource db {
 }
 
 model game_info {
-  id        Int         @id @default(autoincrement())
-  name      String      @unique(map: "game_info_name_unq") @db.VarChar(255)
-  league    league[]
-  user_info user_info[]
+  id      Int       @id @default(autoincrement())
+  name    String    @unique(map: "game_info_name_unq") @db.VarChar
+  fixture fixture[]
+  league  league[]
 }
 
 model user_info {
-  id         Int       @id @default(autoincrement())
-  first_name String    @db.VarChar
-  last_name  String    @db.VarChar
-  email      String    @unique(map: "user_info_unq") @db.VarChar
-  password   String    @db.VarChar
-  role       Int       @db.SmallInt
-  game_info  game_info @relation(fields: [role], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_info_col_role")
+  id         Int    @id @default(autoincrement())
+  first_name String @db.VarChar
+  last_name  String @db.VarChar
+  email      String @unique(map: "user_info_unq") @db.VarChar
+  password   String @db.VarChar
+  role       Int    @db.SmallInt
 }
 
 model user_role {
@@ -30,11 +29,10 @@ model user_role {
 }
 
 model fixture {
-  id          Int     @id @default(autoincrement())
-  team_list   Json    @db.Json
-  winner_team String? @db.VarChar
-  game_id     Int     @db.SmallInt
-  is_active   Boolean @default(true)
+  id         Int       @id @default(autoincrement())
+  match_info Json      @db.Json
+  game_name  String    @db.VarChar
+  game_info  game_info @relation(fields: [game_name], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "fixture_game_name_fk")
 }
 
 model league {
@@ -43,12 +41,12 @@ model league {
   point       Int
   match_count Int
   league_id   Int         @db.SmallInt
-  game_id     Int         @db.SmallInt
-  game_info   game_info   @relation(fields: [game_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "league_game_id_fk")
+  game_name   String      @db.VarChar
+  game_info   game_info   @relation(fields: [game_name], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "league_game_name_fk")
   league_info league_info @relation(fields: [league_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "league_id_fk")
   player_list player_list @relation(fields: [player_name], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "league_player_name_fk")
 
-  @@id([player_name, game_id])
+  @@id([player_name, game_name])
 }
 
 model league_info {
