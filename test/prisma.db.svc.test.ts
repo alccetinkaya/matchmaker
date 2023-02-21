@@ -1,7 +1,7 @@
 import test from 'ava';
 import { FixtureData } from '../src/models/fixture.model';
 import { GameData } from '../src/models/game.model';
-import { LeagueData, LeagueID, LeagueInfoData } from '../src/models/league.model';
+import { LeagueData, LeagueInfoData } from '../src/models/league.model';
 import { PlayerData } from '../src/models/player.model';
 import { UserData, UserRoleID } from '../src/models/user.model';
 import { PrismaDatabaseService } from '../src/services/prisma.database.service';
@@ -156,12 +156,10 @@ test.serial('deletePlayer', async t => {
 
 // ############ league interface test ############
 const validLeagueInfo: LeagueInfoData = {
-    id: LeagueID.ASKO_KUSKO,
-    name: "test",
+    name: "unit_test",
     point: 2
 }
 const invalidLeagueInfo: LeagueInfoData = {
-    id: 11,
     name: "invalid",
     point: 2
 }
@@ -181,7 +179,6 @@ test.serial('selectLeague', async t => {
 
 test.serial('updateLeague', async t => {
     let data: LeagueInfoData = {
-        id: validLeagueInfo.id,
         name: validLeagueInfo.name,
         point: 4
     };
@@ -205,14 +202,14 @@ const validPlayerLeague: LeagueData = {
     playerName: validPlayer.name,
     point: 1,
     matchCount: 1,
-    leagueId: validLeagueInfo.id,
+    leagueName: validLeagueInfo.name,
     gameName: "test"
 }
 const invalidPlayerLeague: LeagueData = {
     playerName: "invalidplayer",
     point: 10,
     matchCount: 10,
-    leagueId: LeagueID.ASKO_KUSKO,
+    leagueName: "invalidleague",
     gameName: "test"
 }
 
@@ -248,7 +245,7 @@ test.serial('updatePlayerLeague', async t => {
         playerName: validPlayerLeague.playerName,
         point: 100,
         matchCount: 100,
-        leagueId: validPlayerLeague.leagueId,
+        leagueName: validPlayerLeague.leagueName,
         gameName: validPlayerLeague.gameName
     };
     let rval = await dbSvc.updatePlayerLeague(data);

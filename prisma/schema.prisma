@@ -40,18 +40,18 @@ model league {
   player_name String      @db.VarChar
   point       Int
   match_count Int
-  league_id   Int         @db.SmallInt
+  league_name String      @db.VarChar
   game_name   String      @db.VarChar
   game_info   game_info   @relation(fields: [game_name], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "league_game_name_fk")
-  league_info league_info @relation(fields: [league_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "league_id_fk")
+  league_info league_info @relation(fields: [league_name], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "league_name_fk")
   player_list player_list @relation(fields: [player_name], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "league_player_name_fk")
 
   @@id([player_name, game_name])
 }
 
 model league_info {
-  id     Int      @id @db.SmallInt
-  name   String   @unique(map: "league_info_id_name_unq") @db.VarChar
+  id     Int      @id @default(autoincrement()) @db.SmallInt
+  name   String   @unique(map: "league_info_name_unq") @db.VarChar
   point  Int      @db.SmallInt
   league league[]
 }

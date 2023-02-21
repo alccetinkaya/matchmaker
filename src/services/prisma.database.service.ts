@@ -242,7 +242,6 @@ export class PrismaDatabaseService implements IDatabase {
         try {
             let rval = await prisma.league_info.create({
                 data: {
-                    id: data.id,
                     name: data.name,
                     point: data.point
                 }
@@ -266,7 +265,6 @@ export class PrismaDatabaseService implements IDatabase {
 
             let result = rval.at(0);
             return {
-                id: result.id,
                 name: result.name,
                 point: result.point
             }
@@ -279,16 +277,14 @@ export class PrismaDatabaseService implements IDatabase {
         try {
             let rval = await prisma.league_info.update({
                 where: {
-                    id: data.id
+                    name: data.name
                 },
                 data: {
-                    name: data.name,
                     point: data.point,
                 }
             });
 
             return {
-                id: rval.id,
                 name: rval.name,
                 point: rval.point
             }
@@ -318,7 +314,7 @@ export class PrismaDatabaseService implements IDatabase {
                     point: data.point,
                     match_count: data.matchCount,
                     game_name: data.gameName,
-                    league_id: data.leagueId
+                    league_name: data.leagueName
                 }
             });
             return rval ? true : false;
@@ -343,7 +339,7 @@ export class PrismaDatabaseService implements IDatabase {
                 playerName: result.player_name,
                 point: result.point,
                 matchCount: result.match_count,
-                leagueId: result.league_id,
+                leagueName: result.league_name,
                 gameName: result.game_name
             }
         } catch (error) {
@@ -370,7 +366,7 @@ export class PrismaDatabaseService implements IDatabase {
                 playerName: rval.player_name,
                 point: rval.point,
                 matchCount: rval.match_count,
-                leagueId: rval.league_id,
+                leagueName: rval.league_name,
                 gameName: rval.game_name
             }
         } catch (error) {
