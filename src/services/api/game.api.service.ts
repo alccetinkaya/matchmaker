@@ -79,7 +79,7 @@ export class GameApiService {
 
     async add(req: any): Promise<ApiRespData> {
         let valid = this.validAddRequest(req);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         let game: GameData = {
             name: req.name
@@ -108,13 +108,19 @@ export class GameApiService {
         }
 
         return prepareSuccessMsg({
-            description: `Game '${game.name}' has created`
+            data: `Game '${game.name}' has created`
         });
     }
 
-    async get(name: string): Promise<ApiRespData> {
+    async get(query: any): Promise<ApiRespData> {
+        if (!Object.keys(query).length) {
+            let dbResp = await this.#dbSvc.selectAllGame();
+            return prepareSuccessMsg({ data: dbResp.map((element) => element.name)});
+        }
+
+        let name = query.name;
         let valid = this.validGetAndDelRequest(name);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         let game: GameData = {
             name: name
@@ -141,16 +147,12 @@ export class GameApiService {
             });
         }
 
-        return prepareSuccessMsg({
-            details: {
-                name: dbResp.name
-            },
-        });
+        return prepareSuccessMsg({ data: { name: dbResp.name } });
     }
 
     async del(name: string): Promise<ApiRespData> {
         let valid = this.validGetAndDelRequest(name);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         let game: GameData = {
             name: name

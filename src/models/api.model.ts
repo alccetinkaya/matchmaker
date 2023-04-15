@@ -16,6 +16,6 @@ export interface ApiFailureMsg {
 
 export interface ApiRespData {
     statusCode: number;
-    successText: ApiSuccessMsg;
-    failureText: ApiFailureMsg;
+    success: any;
+    failure: ApiFailureMsg;
 }

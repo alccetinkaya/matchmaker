@@ -13,14 +13,11 @@ export enum FailDetailCode {
     SERVICE_RESPONSE = "SERVICE_RESPONSE"
 }
 
-export function prepareSuccessMsg({ description = null, details = null, statusCode = 200 }): ApiRespData {
+export function prepareSuccessMsg({ data = null, statusCode = 200 }): ApiRespData {
     return {
         statusCode: statusCode,
-        successText: {
-            description: description,
-            details: details
-        },
-        failureText: null
+        success: data,
+        failure: null
     }
 }
 
@@ -29,8 +26,8 @@ export function prepareFailureMsg(
     { detailCode = null, detailDescription = null }): ApiRespData {
     return {
         statusCode: statusCode,
-        successText: null,
-        failureText: {
+        success: null,
+        failure: {
             code: failCode,
             description: failDescription,
             details: {

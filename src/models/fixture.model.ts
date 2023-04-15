@@ -5,6 +5,7 @@ export interface FixtureMatchInfo {
 }
 
 export interface FixtureData {
+    id: number;
     matchInfo: FixtureMatchInfo[];
     gameName: string;
 }

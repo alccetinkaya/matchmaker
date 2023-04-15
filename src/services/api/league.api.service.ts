@@ -91,7 +91,7 @@ export class LeagueApiService {
 
     async add(req: any): Promise<ApiRespData> {
         let valid = this.validAddAndUpdateRequest(req);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         let leagueInfo: LeagueInfoData = {
             name: req.name,
@@ -120,14 +120,17 @@ export class LeagueApiService {
             });
         }
 
-        return prepareSuccessMsg({
-            description: `League '${leagueInfo.name}' has created`
-        });
+        return prepareSuccessMsg({ data: `League '${leagueInfo.name}' has created` });
     }
 
-    async get(name: any): Promise<ApiRespData> {
+    async get(query: any): Promise<ApiRespData> {
+        if (!Object.keys(query).length) {
+            return prepareSuccessMsg({ data: await this.#dbSvc.selectAllLeague() });
+        }
+
+        let name = query.name;
         let valid = this.validGetAndDelRequest(name);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         let dbResp: LeagueInfoData;
         try {
@@ -149,14 +152,12 @@ export class LeagueApiService {
             });
         }
 
-        return prepareSuccessMsg({
-            details: dbResp,
-        });
+        return prepareSuccessMsg({ data: dbResp });
     }
 
     async update(req: any): Promise<ApiRespData> {
         let valid = this.validAddAndUpdateRequest(req);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         let leagueInfo: LeagueInfoData = {
             name: req.name,
@@ -173,14 +174,12 @@ export class LeagueApiService {
             });
         }
 
-        return prepareSuccessMsg({
-            details: `League '${leagueInfo.name}' has successfully updated`
-        });
+        return prepareSuccessMsg({ data: `League '${leagueInfo.name}' has successfully updated` });
     }
 
     async del(name: string): Promise<ApiRespData> {
         let valid = this.validGetAndDelRequest(name);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         try {
             let rval = await this.#dbSvc.deleteLeague(name);

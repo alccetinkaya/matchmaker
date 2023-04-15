@@ -22,13 +22,13 @@ export class FixtureService {
         }
 
         try {
-            let fixData: FixtureData = { gameName: this.#gameName, matchInfo: rval.result };
+            let fixData: FixtureData = { id: null, gameName: this.#gameName, matchInfo: rval.result };
             let id = await this.#dbSvc.createFixture(fixData);
             if (id == 0) {
                 return prepareFailureMsg("Fixture couldn't be created");
             }
 
-            return prepareSuccessMsg(`Fixture '${id}' has successfully created`);
+            return prepareSuccessMsg(this.#dbSvc.selectFixture(id));
         } catch (error) {
             return prepareFailureMsg(error);
         }

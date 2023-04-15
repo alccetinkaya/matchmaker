@@ -18,7 +18,7 @@ const leagueSvc = new LeagueApiService(new PrismaDatabaseService());
 
 async function sendResult(res: any, data: ApiRespData) {
   res.status(data.statusCode);
-  let respData = data.failureText ? data.failureText : data.successText;
+  let respData = data.failure ? data.failure : data.success;
   res.send(await removeEmptyKeys(respData));
 }
 
@@ -28,7 +28,7 @@ app.post('/game', async (req, res) => {
 })
 
 app.get('/game', async (req, res) => {
-  sendResult(res, await gameSvc.get(req.query.name));
+  sendResult(res, await gameSvc.get(req.query));
 })
 
 app.delete('/game', async (req, res) => {
@@ -41,7 +41,7 @@ app.post('/fixture', async (req, res) => {
 })
 
 app.get('/fixture', async (req, res) => {
-  sendResult(res, await fixtureSvc.get(req.query.id));
+  sendResult(res, await fixtureSvc.get(req.query));
 })
 
 app.put('/fixture', async (req, res) => {
@@ -58,7 +58,7 @@ app.post('/player', async (req, res) => {
 })
 
 app.get('/player', async (req, res) => {
-  sendResult(res, await playerSvc.get(req.query.name));
+  sendResult(res, await playerSvc.get(req.query));
 })
 
 app.delete('/player', async (req, res) => {
@@ -71,7 +71,7 @@ app.post('/league', async (req, res) => {
 })
 
 app.get('/league', async (req, res) => {
-  sendResult(res, await leagueSvc.get(req.query.name));
+  sendResult(res, await leagueSvc.get(req.query));
 })
 
 app.put('/league', async (req, res) => {

@@ -78,6 +78,7 @@ test.serial('deleteUser', async t => {
 // ############ fixture interface test ############
 let fixtureId: number = null;
 const fixture: FixtureData = {
+    id: null,
     matchInfo: [{teamList: {teamA: ["test1", "test2"], teamB: ["test3", "test4"]}, isActive: true, winner: ""}],
     gameName: validGame.name
 }

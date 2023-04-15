@@ -335,7 +335,7 @@ export class FixtureApiService {
 
     async add(req: any): Promise<ApiRespData> {
         let valid = await this.validCreateRequest(req);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         const fixSvc = new FixtureService(this.#dbSvc, req.game, req.team_list, req.player_count, req.player_list);
         let rval = await fixSvc.create();
@@ -349,14 +349,17 @@ export class FixtureApiService {
             });
         }
 
-        return prepareSuccessMsg({
-            description: rval.result
-        });
+        return prepareSuccessMsg({ data: rval.result });
     }
 
-    async get(id: any): Promise<ApiRespData> {
+    async get(query: any): Promise<ApiRespData> {
+        if (!Object.keys(query).length) {
+            return prepareSuccessMsg({ data: await this.#dbSvc.selectAllFixture() });
+        }
+
+        let id = query.id;
         let valid = this.validGetAndDelRequest(id);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         let dbResp: FixtureData;
         try {
@@ -380,14 +383,12 @@ export class FixtureApiService {
             });
         }
 
-        return prepareSuccessMsg({
-            details: dbResp
-        });
+        return prepareSuccessMsg({ data: dbResp });
     }
 
     async update(body: any): Promise<ApiRespData> {
         let valid = await this.validPutRequest(body);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         if (!await this.#dbSvc.updateFixture(body.fixture_id, body.match_index, body.winner)) {
             return prepareFailureMsg({
@@ -399,14 +400,12 @@ export class FixtureApiService {
             });
         }
 
-        return prepareSuccessMsg({
-            details: `Fixture '${body.fixture_id}' has successfully updated`
-        });
+        return prepareSuccessMsg({ data: `Fixture '${body.fixture_id}' has successfully updated` });
     }
 
     async del(id: any): Promise<ApiRespData> {
         let valid = this.validGetAndDelRequest(id);
-        if (valid.failureText) return valid;
+        if (valid.failure) return valid;
 
         try {
             id = parseInt(id);
