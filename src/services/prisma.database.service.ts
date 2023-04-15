@@ -46,6 +46,19 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
+    async selectAllGame(): Promise<GameData[]> {
+        try {
+            let rval = await prisma.game_info.findMany();
+            return rval.map((element) => {
+                return {
+                    name: element.name
+                }
+            })
+        } catch (error) {
+            throw this.getErrorMessage(error);
+        }
+    }
+
     async deleteGame(name: string): Promise<boolean> {
         try {
             const rval = await prisma.game_info.deleteMany({
@@ -100,6 +113,23 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
+    async selectAllUser(): Promise<UserData[]> {
+        try {
+            let rval = await prisma.user_info.findMany();
+            return rval.map((element) => {
+                return {
+                    firstName: element.first_name,
+                    lastName: element.last_name,
+                    email: element.email,
+                    password: element.password,
+                    role: element.role
+                }
+            })
+        } catch (error) {
+            throw this.getErrorMessage(error);
+        }
+    }
+
     async deleteUser(email: string): Promise<boolean> {
         try {
             const rval = await prisma.user_info.deleteMany({
@@ -140,9 +170,25 @@ export class PrismaDatabaseService implements IDatabase {
 
             let fixture = rval.at(0);
             return {
+                id: fixture.id,
                 matchInfo: (fixture.match_info as unknown) as FixtureMatchInfo[],
                 gameName: fixture.game_name,
             }
+        } catch (error) {
+            throw this.getErrorMessage(error);
+        }
+    }
+
+    async selectAllFixture(): Promise<FixtureData[]> {
+        try {
+            let rval = await prisma.fixture.findMany();
+            return rval.map((element) => {
+                return {
+                    id: element.id,
+                    matchInfo: (element.match_info as unknown) as FixtureMatchInfo[],
+                    gameName: element.game_name,
+                }
+            });
         } catch (error) {
             throw this.getErrorMessage(error);
         }
@@ -163,6 +209,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
 
             return {
+                id: fixture.id,
                 matchInfo: (rval.match_info as unknown) as FixtureMatchInfo[],
                 gameName: rval.game_name,
             }
@@ -219,7 +266,12 @@ export class PrismaDatabaseService implements IDatabase {
 
     async selectAllPlayer(): Promise<PlayerData[]> {
         try {
-            return await prisma.player_list.findMany();
+            let rval = await prisma.player_list.findMany();
+            return rval.map((element) => {
+                return {
+                    name: element.name
+                }
+            });
         } catch (error) {
             throw this.getErrorMessage(error);
         }
@@ -268,6 +320,20 @@ export class PrismaDatabaseService implements IDatabase {
                 name: result.name,
                 point: result.point
             }
+        } catch (error) {
+            throw this.getErrorMessage(error);
+        }
+    }
+
+    async selectAllLeague(): Promise<LeagueInfoData[]> {
+        try {
+            let rval = await prisma.league_info.findMany();
+            return rval.map((element) => {
+                return {
+                    name: element.name,
+                    point: element.point
+                }
+            });
         } catch (error) {
             throw this.getErrorMessage(error);
         }
@@ -342,6 +408,23 @@ export class PrismaDatabaseService implements IDatabase {
                 leagueName: result.league_name,
                 gameName: result.game_name
             }
+        } catch (error) {
+            throw this.getErrorMessage(error);
+        }
+    }
+
+    async selectAllPlayerLeague(): Promise<LeagueData[]> {
+        try {
+            let rval = await prisma.league.findMany();
+            return rval.map((element) => {
+                return {
+                    playerName: element.player_name,
+                    point: element.point,
+                    matchCount: element.match_count,
+                    leagueName: element.league_name,
+                    gameName: element.game_name
+                }
+            });
         } catch (error) {
             throw this.getErrorMessage(error);
         }
