@@ -194,10 +194,34 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async updateFixture(id: number, matchInd: number, winner: string): Promise<FixtureData> {
+    async updateFixtureByWinner(id: number, matchInd: number, winner: string): Promise<FixtureData> {
         try {
             let fixture = await this.selectFixture(id);
             fixture.matchInfo[matchInd].winner = winner;
+
+            let rval = await prisma.fixture.update({
+                where: {
+                    id: id
+                },
+                data: {
+                    match_info: (fixture.matchInfo as unknown) as Prisma.JsonArray
+                }
+            });
+
+            return {
+                id: fixture.id,
+                matchInfo: (rval.match_info as unknown) as FixtureMatchInfo[],
+                gameName: rval.game_name,
+            }
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async updateFixtureByActive(id: number, matchInd: number, active: boolean): Promise<FixtureData> {
+        try {
+            let fixture = await this.selectFixture(id);
+            fixture.matchInfo[matchInd].isActive = active;
 
             let rval = await prisma.fixture.update({
                 where: {
@@ -290,7 +314,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async createLeague(data: LeagueInfoData): Promise<boolean> {
+    async createLeagueInfo(data: LeagueInfoData): Promise<boolean> {
         try {
             let rval = await prisma.league_info.create({
                 data: {
@@ -304,7 +328,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async selectLeague(name: string): Promise<LeagueInfoData> {
+    async selectLeagueInfo(name: string): Promise<LeagueInfoData> {
         try {
             let rval = await prisma.league_info.findMany({
                 where: {
@@ -313,7 +337,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
 
             if (rval.length == 0) return null;
-            if (rval.length > 1) throw `Select league returned more than one! Name: ${name}`;
+            if (rval.length > 1) throw `Select league info returned more than one! Name: ${name}`;
 
             let result = rval.at(0);
             return {
@@ -325,7 +349,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async selectAllLeague(): Promise<LeagueInfoData[]> {
+    async selectAllLeagueInfo(): Promise<LeagueInfoData[]> {
         try {
             let rval = await prisma.league_info.findMany();
             return rval.map((element) => {
@@ -339,7 +363,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async updateLeague(data: LeagueInfoData): Promise<LeagueInfoData> {
+    async updateLeagueInfo(data: LeagueInfoData): Promise<LeagueInfoData> {
         try {
             let rval = await prisma.league_info.update({
                 where: {
@@ -359,7 +383,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async deleteLeague(name: string): Promise<boolean> {
+    async deleteLeagueInfo(name: string): Promise<boolean> {
         try {
             const rval = await prisma.league_info.deleteMany({
                 where: {
@@ -372,7 +396,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async createPlayerLeague(data: LeagueData): Promise<boolean> {
+    async createLeague(data: LeagueData): Promise<boolean> {
         try {
             let rval = await prisma.league.create({
                 data: {
@@ -389,7 +413,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async selectPlayerLeague(name: string): Promise<LeagueData> {
+    async selectLeagueByName(name: string): Promise<LeagueData> {
         try {
             let rval = await prisma.league.findMany({
                 where: {
@@ -398,7 +422,7 @@ export class PrismaDatabaseService implements IDatabase {
             });
 
             if (rval.length == 0) return null;
-            if (rval.length > 1) throw `Select player league returned more than one! Name: ${name}`;
+            if (rval.length > 1) throw `Select league returned more than one! Name: ${name}`;
 
             let result = rval.at(0);
             return {
@@ -413,7 +437,30 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async selectAllPlayerLeague(): Promise<LeagueData[]> {
+    async selectLeagueByGame(game: string): Promise<LeagueData[]> {
+        try {
+            let rval = await prisma.league.findMany({
+                where: {
+                    game_name: game
+                }
+            });
+
+            if (rval.length == 0) return null;
+            return rval.map((element) => {
+                return {
+                    playerName: element.player_name,
+                    point: element.point,
+                    matchCount: element.match_count,
+                    leagueName: element.league_name,
+                    gameName: element.game_name
+                }
+            });
+        } catch (error) {
+            throw this.getErrorMessage(error);
+        }
+    }
+
+    async selectAllLeague(): Promise<LeagueData[]> {
         try {
             let rval = await prisma.league.findMany();
             return rval.map((element) => {
@@ -430,7 +477,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async updatePlayerLeague(data: LeagueData): Promise<LeagueData> {
+    async updateLeague(data: LeagueData): Promise<LeagueData> {
         try {
             let rval = await prisma.league.update({
                 where: {
@@ -457,7 +504,7 @@ export class PrismaDatabaseService implements IDatabase {
         }
     }
 
-    async deletePlayerLeague(name: string): Promise<boolean> {
+    async deleteLeague(name: string): Promise<boolean> {
         try {
             const rval = await prisma.league.deleteMany({
                 where: {

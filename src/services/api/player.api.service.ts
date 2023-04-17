@@ -113,8 +113,19 @@ export class PlayerApiService {
 
     async get(query: any): Promise<ApiRespData> {
         if (!Object.keys(query).length) {
-            let dbResp = await this.#dbSvc.selectAllPlayer();
-            return prepareSuccessMsg({ data: dbResp.map((element) => element.name) });
+            try {
+                let dbResp = await this.#dbSvc.selectAllPlayer();
+                return prepareSuccessMsg({ data: dbResp.map((element) => element.name) });
+            } catch (error) {
+                return prepareFailureMsg({
+                    failCode: FailCode.OPERATION_ERROR,
+                    failDescription: `All players couldn't found`,
+                    statusCode: 500
+                }, {
+                    detailCode: FailDetailCode.DATABASE_ERROR,
+                    detailDescription: error
+                });
+            }
         }
 
         let name = query.name;

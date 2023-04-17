@@ -195,7 +195,6 @@ export class FixtureApiService {
             }, {
                 detailCode: FailDetailCode.REQUIRED_PROPERTY,
                 detailDescription: "Query doesn't have 'id' property"
-
             });
         }
 
@@ -354,7 +353,18 @@ export class FixtureApiService {
 
     async get(query: any): Promise<ApiRespData> {
         if (!Object.keys(query).length) {
-            return prepareSuccessMsg({ data: await this.#dbSvc.selectAllFixture() });
+            try {
+                return prepareSuccessMsg({ data: await this.#dbSvc.selectAllFixture() });
+            } catch (error) {
+                return prepareFailureMsg({
+                    failCode: FailCode.OPERATION_ERROR,
+                    failDescription: `All fixtures couldn't found`,
+                    statusCode: 500
+                }, {
+                    detailCode: FailDetailCode.DATABASE_ERROR,
+                    detailDescription: error
+                });
+            }
         }
 
         let id = query.id;
@@ -390,7 +400,7 @@ export class FixtureApiService {
         let valid = await this.validPutRequest(body);
         if (valid.failure) return valid;
 
-        if (!await this.#dbSvc.updateFixture(body.fixture_id, body.match_index, body.winner)) {
+        if (!await this.#dbSvc.updateFixtureByWinner(body.fixture_id, body.match_index, body.winner)) {
             return prepareFailureMsg({
                 failCode: FailCode.OPERATION_ERROR,
                 failDescription: `Fixture '${body.id}' couldn't be updated`,

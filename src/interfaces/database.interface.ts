@@ -21,7 +21,8 @@ export interface IDatabase {
     createFixture(fixture: FixtureData): Promise<number>;
     selectFixture(id: number): Promise<FixtureData>;
     selectAllFixture(): Promise<FixtureData[]>;
-    updateFixture(id: number, matchInd: number, winner: string): Promise<FixtureData>;
+    updateFixtureByWinner(id: number, matchInd: number, winner: string): Promise<FixtureData>;
+    updateFixtureByActive(id: number, matchInd: number, active: boolean): Promise<FixtureData>;
     deleteFixture(id: number): Promise<boolean>;
 
     // player interface
@@ -30,17 +31,18 @@ export interface IDatabase {
     selectAllPlayer(): Promise<PlayerData[]>;
     deletePlayer(name: string): Promise<boolean>;
 
-    // league interface
-    createLeague(data: LeagueInfoData): Promise<boolean>;
-    selectLeague(name: string): Promise<LeagueInfoData>;
-    selectAllLeague(): Promise<LeagueInfoData[]>;
-    updateLeague(data: LeagueInfoData): Promise<LeagueInfoData>;
-    deleteLeague(name: string): Promise<boolean>;
+    // league info interface
+    createLeagueInfo(data: LeagueInfoData): Promise<boolean>;
+    selectLeagueInfo(name: string): Promise<LeagueInfoData>;
+    selectAllLeagueInfo(): Promise<LeagueInfoData[]>;
+    updateLeagueInfo(data: LeagueInfoData): Promise<LeagueInfoData>;
+    deleteLeagueInfo(name: string): Promise<boolean>;
 
-    // player league interface
-    createPlayerLeague(data: LeagueData): Promise<boolean>;
-    selectPlayerLeague(name: string): Promise<LeagueData>;
-    selectAllPlayerLeague(): Promise<LeagueData[]>;
-    updatePlayerLeague(data: LeagueData): Promise<LeagueData>;
-    deletePlayerLeague(name: string): Promise<boolean>;
+    // league interface
+    createLeague(data: LeagueData): Promise<boolean>;
+    selectLeagueByName(name: string): Promise<LeagueData>;
+    selectLeagueByGame(name: string): Promise<LeagueData[]>;
+    selectAllLeague(): Promise<LeagueData[]>;
+    updateLeague(data: LeagueData): Promise<LeagueData>;
+    deleteLeague(name: string): Promise<boolean>;
 }

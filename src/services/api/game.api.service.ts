@@ -114,8 +114,19 @@ export class GameApiService {
 
     async get(query: any): Promise<ApiRespData> {
         if (!Object.keys(query).length) {
-            let dbResp = await this.#dbSvc.selectAllGame();
-            return prepareSuccessMsg({ data: dbResp.map((element) => element.name)});
+            try {
+                let dbResp = await this.#dbSvc.selectAllGame();
+                return prepareSuccessMsg({ data: dbResp.map((element) => element.name)});
+            } catch (error) {
+                return prepareFailureMsg({
+                    failCode: FailCode.OPERATION_ERROR,
+                    failDescription: `All games couldn't found`,
+                    statusCode: 500
+                }, {
+                    detailCode: FailDetailCode.DATABASE_ERROR,
+                    detailDescription: error
+                })
+            }
         }
 
         let name = query.name;

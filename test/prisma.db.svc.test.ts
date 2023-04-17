@@ -103,11 +103,11 @@ test.serial('selectFixture', async t => {
     t.deepEqual(rval, null);
 });
 
-test.serial('updateFixture', async t => {
-    let rval = await dbSvc.updateFixture(fixtureId, 0, "teamA");
+test.serial('updateFixtureByWinner', async t => {
+    let rval = await dbSvc.updateFixtureByWinner(fixtureId, 0, "teamA");
     t.deepEqual(rval.matchInfo[0].winner, "teamA");
 
-    rval = await dbSvc.updateFixture(-1, 0, "");
+    rval = await dbSvc.updateFixtureByWinner(-1, 0, "");
     t.deepEqual(rval, null);
 });
 
@@ -155,7 +155,7 @@ test.serial('deletePlayer', async t => {
     t.deepEqual(rval, false);
 });
 
-// ############ league interface test ############
+// ############ league info interface test ############
 const validLeagueInfo: LeagueInfoData = {
     name: "unit_test",
     point: 2
@@ -166,15 +166,15 @@ const invalidLeagueInfo: LeagueInfoData = {
 }
 
 test.serial('createLeague', async t => {
-    let rval = await dbSvc.createLeague(validLeagueInfo);
+    let rval = await dbSvc.createLeagueInfo(validLeagueInfo);
     t.deepEqual(rval, true);
 });
 
 test.serial('selectLeague', async t => {
-    let rval = await dbSvc.selectLeague(validLeagueInfo.name);
+    let rval = await dbSvc.selectLeagueInfo(validLeagueInfo.name);
     t.deepEqual(rval.name, validLeagueInfo.name);
 
-    rval = await dbSvc.selectLeague(invalidLeagueInfo.name);
+    rval = await dbSvc.selectLeagueInfo(invalidLeagueInfo.name);
     t.deepEqual(rval, null);
 });
 
@@ -183,10 +183,10 @@ test.serial('updateLeague', async t => {
         name: validLeagueInfo.name,
         point: 4
     };
-    let rval = await dbSvc.updateLeague(data);
+    let rval = await dbSvc.updateLeagueInfo(data);
     t.deepEqual(rval.point, data.point);
 
-    rval = await dbSvc.updateLeague(invalidLeagueInfo);
+    rval = await dbSvc.updateLeagueInfo(invalidLeagueInfo);
     t.deepEqual(rval, null);
 });
 
@@ -199,14 +199,14 @@ test.serial('deleteLeague', async t => {
 });
 
 // ############ league interface test ############
-const validPlayerLeague: LeagueData = {
+const validLeague: LeagueData = {
     playerName: validPlayer.name,
     point: 1,
     matchCount: 1,
     leagueName: validLeagueInfo.name,
     gameName: "test"
 }
-const invalidPlayerLeague: LeagueData = {
+const invalidLeague: LeagueData = {
     playerName: "invalidplayer",
     point: 10,
     matchCount: 10,
@@ -214,12 +214,12 @@ const invalidPlayerLeague: LeagueData = {
     gameName: "test"
 }
 
-///////////// create player league test data /////////////
+///////////// create league test data /////////////
 test.serial('createForPlayerLeagueTestData', async t => {
     let player = await dbSvc.createPlayer(validPlayer);
     t.deepEqual(player, true);
 
-    let league = await dbSvc.createLeague(validLeagueInfo);
+    let league = await dbSvc.createLeagueInfo(validLeagueInfo);
     t.deepEqual(league, true);
 
     let game = await dbSvc.createGame(validGame);
@@ -227,46 +227,46 @@ test.serial('createForPlayerLeagueTestData', async t => {
 });
 //////////////////////////////////////////////////////////
 
-test.serial('createPlayerLeague', async t => {
-    let rval = await dbSvc.createPlayerLeague(validPlayerLeague);
+test.serial('createLeague', async t => {
+    let rval = await dbSvc.createLeague(validLeague);
     t.deepEqual(rval, true);
 });
 
-test.serial('selectPlayerLeague', async t => {
-    let rval = await dbSvc.selectPlayerLeague(validPlayerLeague.playerName);
-    t.deepEqual(rval.point, validPlayerLeague.point);
-    t.deepEqual(rval.matchCount, validPlayerLeague.matchCount);
+test.serial('selectLeague', async t => {
+    let rval = await dbSvc.selectLeagueByName(validLeague.playerName);
+    t.deepEqual(rval.point, validLeague.point);
+    t.deepEqual(rval.matchCount, validLeague.matchCount);
 
-    rval = await dbSvc.selectPlayerLeague(invalidPlayerLeague.playerName);
+    rval = await dbSvc.selectLeagueByName(invalidLeague.playerName);
     t.deepEqual(rval, null);
 });
 
-test.serial('updatePlayerLeague', async t => {
+test.serial('updateLeague', async t => {
     let data: LeagueData = {
-        playerName: validPlayerLeague.playerName,
+        playerName: validLeague.playerName,
         point: 100,
         matchCount: 100,
-        leagueName: validPlayerLeague.leagueName,
-        gameName: validPlayerLeague.gameName
+        leagueName: validLeague.leagueName,
+        gameName: validLeague.gameName
     };
-    let rval = await dbSvc.updatePlayerLeague(data);
+    let rval = await dbSvc.updateLeague(data);
     t.deepEqual(rval.point, data.point);
     t.deepEqual(rval.matchCount, data.matchCount);
 
-    rval = await dbSvc.updatePlayerLeague(invalidPlayerLeague);
+    rval = await dbSvc.updateLeague(invalidLeague);
     t.deepEqual(rval, null);
 });
 
-test.serial('deletePlayerLeague', async t => {
-    let rval = await dbSvc.deletePlayerLeague(validPlayerLeague.playerName);
+test.serial('deleteLeague', async t => {
+    let rval = await dbSvc.deleteLeague(validLeague.playerName);
     t.deepEqual(rval, true);
 
-    rval = await dbSvc.deleteLeague(invalidPlayerLeague.playerName);
+    rval = await dbSvc.deleteLeague(invalidLeague.playerName);
     t.deepEqual(rval, false);
 });
 
-///////////// delete player league test data /////////////
-test.serial('deletePlayerLeagueTestData', async t => {
+///////////// delete league test data /////////////
+test.serial('deleteLeagueTestData', async t => {
     let player = await dbSvc.deletePlayer(validPlayer.name);
     t.deepEqual(player, true);
 
